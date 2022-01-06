@@ -1,0 +1,48 @@
+nav{
+    background-color: rgb(29, 29, 29);
+    color: blanchedalmond;
+    padding: 20px 60px;
+    display: flex;
+    justify-content: space-between;
+}
+
+body{
+    background-color: rgb(59, 59, 59);
+    color: blanchedalmond;
+}
+
+nav ul{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+nav li{
+    list-style: none;
+}
+
+nav li a{
+    color: blanchedalmond;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px 10px;
+}
+
+nav li a:hover{
+    color: rgba(255, 235, 205, 0.678);
+}
+
+div.card {
+    color: blanchedalmond;
+    background-color: rgb(88, 88, 88);
+    border-radius: 3px;
+}
+
+div.container{
+    padding-top: 20px;
+}
+
+button{
+    background-color: blanchedalmond;
+    color: black;
+}
