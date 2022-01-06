@@ -9,4 +9,8 @@ router.get("/register", (req, res) =>{
     res.render('register')
 });
 
+router.get("/Login", (req, res) =>{
+    res.render('login') // TODO implement login.hbs 
+})
+
 module.exports = router;
