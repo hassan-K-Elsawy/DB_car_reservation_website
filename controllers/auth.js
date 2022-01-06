@@ -67,10 +67,8 @@ exports.login = (req, res) =>{
             });
         } else{ 
             if( bcrypt.compare(password, results[0].password) ){
-                console.log('pass compare');
-                return res.render('index', {
-                    message: "user registerd"
-                });
+                console.log('login successful');
+                return res.render('index');
             }   
         }
     })
