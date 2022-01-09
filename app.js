@@ -1,8 +1,12 @@
-const express = require('express');
-const mysql = require('mysql');
-const dotenv = require('dotenv');
-const path = require('path');
-const router = express.Router();
+const express      = require('express');
+const mysql        = require('mysql');
+const dotenv       = require('dotenv');
+const path         = require('path');
+const session      = require('express-session')
+const redis        = require('redis');
+const connectRedis = require('connect-redis');
+const router       = express.Router();
+
 
 dotenv.config({path:'./.env'});
 
@@ -31,10 +35,38 @@ db.connect((err) => {
     }
 });
 
+app.set('trust proxy', 1);
+const RedisStore = connectRedis(session);
+
+const redisClient = redis.createClient({
+    host: 'localhost',
+    port: 6379
+});
+
+redisClient.on('error', function (err) {
+    console.log('Could not establish a connection with redis. ' + err);
+});
+
+redisClient.on('connect', function (err) {
+    console.log('Connected to redis successfully');
+});
+
+app.use(session({
+    store: new RedisStore({ client: redisClient }),
+    secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
+    saveUninitialized:false,
+    resave: false,
+    cookie: {
+        secure: false, // if true only transmit cookie over https
+        httpOnly: false, // if true prevent client side JS from reading the cookie 
+        maxAge: 1000 * 60 * 10 // session max age in miliseconds
+    }
+}));
+
 app.use('/', require('./routes/pages.js'));
 app.use('/auth', require('./routes/auth'));
 
 
 app.listen(5000, () => {
     console.log("Server started on port 5000")
-})
+});
