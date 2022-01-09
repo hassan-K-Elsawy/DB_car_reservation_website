@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 
-dotenv.config({path:'./.env'});
+dotenv.config({ path: './.env' });
 
 const db = mysql.createConnection({
     host: process.env.DATABASE_HOST,
@@ -12,20 +12,19 @@ const db = mysql.createConnection({
     database: process.env.DATABASE
 });
 
-exports.register = (req, res) =>{
-    const {name, email, password, rePassword} = req.body;
+exports.register = (req, res) => {
+    const { name, email, password, rePassword } = req.body;
 
-    db.query('SELECT email FROM user WHERE email LIKE ?', [email], async (error,results) => {
-        if(error){
+    db.query('SELECT email FROM user WHERE email LIKE ?', [email], async (error, results) => {
+        if (error) {
             console.log(error);
         }
 
-        if(results.length > 0){
+        if (results.length > 0) {
             return res.render('register', {
                 message: 'email already in use'
             })
-        }else if (password !== rePassword)
-        {
+        } else if (password !== rePassword) {
             return res.render("register", {
                 message: "passwords don't match"
             });
@@ -33,10 +32,10 @@ exports.register = (req, res) =>{
 
         let hashedPass = await bcrypt.hash(password, 8);
 
-        db.query('INSERT INTO user Set ?',{name: name, email:email, password: hashedPass}, (error, results)=>{
-            if(error){
+        db.query('INSERT INTO user Set ?', { name: name, email: email, password: hashedPass }, (error, results) => {
+            if (error) {
                 console.log(error);
-            }else{
+            } else {
                 return res.render("register", {
                     message: "user registerd"
                 });
@@ -47,30 +46,40 @@ exports.register = (req, res) =>{
     //res.send("Form submitted");
 }
 
-exports.login = (req, res) =>{
-    const {email, password} = req.body;
-
+exports.login = (req, res) => {
+    const { email, password } = req.body;
     //console.log("in login func");
 
-    db.query('Select email,password From user WHERE email LIKE ?', [email], async (error, results) =>{
-        if(error){
+    db.query('Select email,password From user WHERE email LIKE ?', [email], async (error, results) => {
+        if (error) {
             console.log(error);
         }
 
         //console.log(hashedPass);
         //console.log(results[0].password);
 
-        if(results.length == 0){
+        if (results.length == 0) {
             console.log('no results')
             return res.render('login', {
                 message: 'email not registered'
             });
-        } else{ 
-            if( bcrypt.compare(password, results[0].password) ){
-                console.log('login successful');
-                return res.render('index');
-            }   
+        } else {
+            bcrypt.compare(password, results[0].password, function (err, results) {
+                if (err) {
+                    throw err;
+                }
+                if (results) {
+                    req.session.email =  email;    
+                    console.log(results)
+                    return res.render('loginTest');
+                } else {
+                    return res.render('login', {
+                        message: 'Invalid Credentials'
+                    });
+                }
+            });
         }
+
     })
 
 }

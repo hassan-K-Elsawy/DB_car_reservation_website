@@ -25,7 +25,7 @@ CREATE TABLE car(
     PRIMARY KEY (plateID)
 );
 
-CREATE TABLE reservetion(
+CREATE TABLE reservation(
     userID int NOT Null,
     plateID varchar(20) NOT NULL,
     recieveDate date NOT NULL,
