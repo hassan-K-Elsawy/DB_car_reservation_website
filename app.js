@@ -7,7 +7,6 @@ const redis        = require('redis');
 const connectRedis = require('connect-redis');
 const router       = express.Router();
 
-
 dotenv.config({path:'./.env'});
 
 const app = express();
@@ -15,7 +14,7 @@ const app = express();
 const db = mysql.createConnection({
     host: process.env.DATABASE_HOST,
     user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWORD,
+//    password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE
 });
 

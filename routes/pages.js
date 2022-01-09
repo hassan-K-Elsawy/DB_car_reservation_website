@@ -64,8 +64,18 @@ router.post("/cart", (req, res) =>{
     })
 });
 
-
-
+router.get("/reservations", (req, res) => {
+    db.query('SELECT * FROM reservetion r INNER JOIN car c ON r.plateID = c.plateID', (error, results)=>{
+        if(error){
+            console.log(error);
+        }else{
+            console.log(results);
+            return res.render("reservations", {
+                reservation: results 
+            });
+        }
+    });
+});
 
 
 module.exports = router;
