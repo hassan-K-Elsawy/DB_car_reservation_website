@@ -19,7 +19,11 @@ router.get("/register", (req, res) =>{
 
 router.get("/Login", (req, res) =>{
     res.render('login') 
-})
+});
+
+router.get("/specs", (req,res)=>{
+    res.render('spec');
+});
 
 router.get("/store", (req, res) => {
     db.query('SELECT * FROM car WHERE status = "available" ', (error, results)=>{
