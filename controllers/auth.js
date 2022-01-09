@@ -65,7 +65,7 @@ exports.login = (req, res) =>{
             return res.render('login', {
                 message: 'email not registered'
             });
-        } else{ 
+        }else{ 
             if( bcrypt.compare(password, results[0].password) ){
                 console.log('login successful');
                 return res.render('index');
