@@ -3,22 +3,35 @@ const router = express.Router();
 const mysql = require('mysql');
 
 const db = mysql.createConnection({
-    host: process.env.DATABASE_HOST,
-    user: process.env.DATABASE_USER,
+    host    : process.env.DATABASE_HOST,
+    user    : process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE
 });
 
+
 router.get("/", (req, res) => {
-    res.render('index');
+    session  = req.session;
+    if(session.email)
+        res.render('loginTest');
+    else
+        res.render('index');
 });
 
 router.get("/register", (req, res) =>{
     res.render('register')
 });
 
+router.get("/Logout", (req, res) =>{
+    if(req.session)
+        req.session.destroy();
+    res.render('login');
+});
+
+
+
 router.get("/Login", (req, res) =>{
-    res.render('login') 
+    res.render('login')
 });
 
 router.get("/specs", (req,res)=>{
