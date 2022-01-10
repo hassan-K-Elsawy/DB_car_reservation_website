@@ -26,13 +26,14 @@ CREATE TABLE car(
 );
 
 CREATE TABLE reservation(
+    reservationID int NOT NULL AUTO_INCREMENT,
     userID int NOT Null,
     plateID varchar(20) NOT NULL,
     recieveDate date NOT NULL,
     returnDate date,
     payment int,
 
-    PRIMARY KEY (userID, plateID, recieveDate),
+    PRIMARY KEY (reservationID),
     FOREIGN KEY (userID) REFERENCES `user`(userID),
     FOREIGN KEY (plateID) REFERENCES car(plateID)
 );

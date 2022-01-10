@@ -50,20 +50,26 @@ exports.register = (req, res) => {
 exports.login = (req, res) => {
     const { email, password } = req.body;
     //console.log("in login func");
+    if(email == 'admin' && password =='admin'){
+        db.query(' SELECT * FROM car ', (error, results)=>{
+            if(error){
+                console.log(error);
+            }else{
+                return res.render("storeAdmin", {
+                    cars: results 
+                });
+            }
+        });
+    }else{
 
-    db.query('Select email,password From user WHERE email LIKE ?', [email], async (error, results) => {
-        if (error) {
-            console.log(error);
-        }
+        db.query('Select email,password From user WHERE email LIKE ?', [email], async (error, results) => {
+            if (error) {
+                console.log(error);
+            }
 
-        //console.log(hashedPass);
-        //console.log(results[0].password);
+            //console.log(hashedPass);
+            //console.log(results[0].password);
 
-        if (results.length == 0) {
-            console.log('no results')
-            return res.render('login', {
-                message: 'email not registered'
-            });
 
         } else {
             bcrypt.compare(password, results[0].password, function (err, results) {
@@ -98,4 +104,5 @@ exports.login = (req, res) => {
             });
         }
     })
+
 }

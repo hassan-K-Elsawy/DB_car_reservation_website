@@ -16,8 +16,7 @@
     <nav>
         <h4>DB Project</h4>
         <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/login">Sign out</a></li>
+            <li><a href="/logout">Sign out</a></li>
             <li><a href="/addCar">Add Car</a></li>
             <li><a href="/reservationsAdmin">View Reservations</a></li>
         </ul>
@@ -37,6 +36,7 @@
                             <li>{{millageOnFullTank}} / tank</li>
                             <li>{{fuelType}}</li>
                             <li>{{noOfSeats}} seater</li>
+                            <li>{{status}}</li>
                             <li class="grey">
                                 <form action="/deleteCar" method="POST">
                                     <input type="hidden" id='car' name='car' value="{{plateID}}">
