@@ -11,6 +11,7 @@ const db = mysql.createConnection({
     port: process.env.DATABASE_PORT
 });
 
+
 router.get("/", (req, res) => {
     session  = req.session;
     if(session.email)
@@ -55,12 +56,12 @@ router.post("/addCaradd", (req, res) =>{
     return res.render('addCar')
 });
 
-router.get("/register", (req, res) =>{
+router.get("/register", (req, res) => {
     res.render('register')
 });
 
-router.get("/Logout", (req, res) =>{
-    if(req.session)
+router.get("/Logout", (req, res) => {
+    if (req.session)
         req.session.destroy();
     res.render('login');
 });
@@ -107,47 +108,44 @@ router.post("/deleteCar", (req,res)=>{
         }
     });
 });
-
-router.get("/Login", (req, res) =>{
+router.get("/Login", (req, res) => {
     res.render('login')
 });
 
-router.get("/specs", (req,res)=>{
+router.get("/specs", (req, res) => {
     res.render('spec');
 });
 
 router.get("/store", (req, res) => {
-    db.query('SELECT * FROM car WHERE status = "available" ', (error, results)=>{
-        if(error){
+    db.query('SELECT * FROM car WHERE status = "available" ', (error, results) => {
+        if (error) {
             console.log(error);
-        }else{
+        } else {
             return res.render("store", {
-                cars: results 
+                cars: results
             });
         }
     });
 });
 
-router.post("/cart", (req, res) =>{
+router.post("/cart", (req, res) => {
     const carid = req.body.car;
-    db.query('SELECT * FROM car WHERE plateID = ?',[carid] ,(error, results) =>{
-        if(error){
-                console.log(error);
-        }else{
+    db.query('SELECT * FROM car WHERE plateID = ?', [carid], (error, results) => {
+        if (error) {
+            console.log(error);
+        } else {
             //console.log(results);
             return res.render("cart", {
                 car: results[0]
-            });  
-        }   
+            });
+        }
     })
 });
 
 router.post("/reserve", (req, res) => {
-
     console.log('the customer has payed successfuly')
-
     const email = req.session.email;
-    var { plateID, reserveDate, returnDate } = req.body;
+    var { plateID, reserveDate, returnDate, price} = req.body;
     reserveDate = new Date(reserveDate);
     returnDate = new Date(returnDate);
 
@@ -180,10 +178,12 @@ router.post("/reserve", (req, res) => {
                     // database call end.
         if (oldRes != null && oldRes[0] != null) {
             var reservedEndDate = new Date(oldRes[0].oldest);
-            console.log(reservedEndDate.getDate());
-            console.log(reserveDate.getDate());
-            if (reservedEndDate.getDate() < reserveDate.getDate()) {
-                console.log("1");
+            if (reservedEndDate.setHours(0,0,0,0) <= reserveDate.setHours(0,0,0,0)) {
+
+                var reservingDays = returnDate.getTime() - reserveDate.getTime()
+                reservingDays = reservingDays / (1000*60*60*24);
+                price = reservingDays * price;
+
                 //database call:
                 db.query('INSERT INTO reservation (userID,plateID,recieveDate,returnDate) VALUES (?,?,?,?)',
                         [req.session.userID, plateID, reserveDate.toISOString(), returnDate.toISOString()], 
@@ -256,13 +256,13 @@ router.post("/reserve", (req, res) => {
 })
 
 router.get("/reservations", (req, res) => {
-    db.query('SELECT * FROM reservation r INNER JOIN car c ON r.plateID = c.plateID', (error, results)=>{
-        if(error){
+    db.query('SELECT * FROM reservation r INNER JOIN car c ON r.plateID = c.plateID', (error, results) => {
+        if (error) {
             console.log(error);
-        }else{
+        } else {
             console.log(results);
             return res.render("reservations", {
-                reservation: results 
+                reservation: results
             });
         }
     });
