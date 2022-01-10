@@ -10,17 +10,49 @@
     <link rel="stylesheet" href="/style.css">
     <title>Document</title>
 </head>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+{{!-- <script>
+    function validateData() {
+        var resDate = new Date(document.getElementById('resDate').value);
+        var returnDate = new Date(document.getElementById('returnDate').value);
+        if (returnDate.getTime() >= resDate.getTime()) {
+            $.ajax({
+                type: "POST",
+                url: "/reserve",
+                data: {
+                    plateID: document.getElementById('plateid').value,
+                    reserveDate: resDate,
+                    returnDate: returnDate
+                },
+                cache: false,
+                success: function (data) {
+                    $("html").html(data);
+                    //window.location.replace("/reservations");
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                }
+            });
+        }
+        else {
+            var error = document.getElementById('error');
+            error.className = "alert alert-danger mt-4";
+            error.textContent = "Please enter a valid reservation date and return date";
+            console.log("Error");
+        }
+    }
+</script> --}}
 
 <body>
 
     <nav>
         <h4>DB Project</h4>
         <ul>
-            <li><a href="/">Home</a></li>
+            <li><a href="/reservations">My reservations</a></li>
             <li><a href="/login">Sign out</a></li>
         </ul>
     </nav>
+
 
     <div class="container mt4">
         {{#with car}}
@@ -36,15 +68,27 @@
                 <li>{{noOfSeats}} seater</li>
                 <li>type:{{type}}</li>
                 <br>
-                <form action="/reserve" method='POST'><input type="date" id='resDate' name='resDate'>
-                <input type="submit" value='Reserve Car'></form>
+                <form method="POST" action="/reserve">
+                    <label for="resDate">Reservation date</label>
+                    <input type="date" id='reserveDate' name='reserveDate'>
+                    <br>
+                    <label for="returnDate">Return date</label>
+                    <input type="date" id='returnDate' name='returnDate'>
+                    <br><br>
+                    <input type="hidden" id='plateID' name='plateID' value='{{plateID}}'>
+                    <input type="submit" value='Reserve Car'>
+                </form>
             </div>
-
         </div>
         {{/with}}
-        
+        <br><br>
+        {{#if message}}
+        <h4 id="error" class="alert alert-danger mt-4"></span>{{message}}</h4>
+        {{else}}
+        <span id="error"></span>
+        {{/if}}
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
         crossorigin="anonymous"></script>
