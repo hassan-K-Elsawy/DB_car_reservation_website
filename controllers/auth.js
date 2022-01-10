@@ -71,8 +71,7 @@ exports.login = (req, res) => {
                 }
                 if (results) {
                     req.session.email =  email;    
-                    console.log(results)
-                    return res.render('loginTest');
+                    return res.render('store');
                 } else {
                     return res.render('login', {
                         message: 'Invalid Credentials'
