@@ -9,7 +9,8 @@ const db = mysql.createConnection({
     host: process.env.DATABASE_HOST,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
-    database: process.env.DATABASE
+    database: process.env.DATABASE,
+    port:process.env.DATABASE_PORT
 });
 
 exports.register = (req, res) => {
@@ -82,8 +83,16 @@ exports.login = (req, res) => {
                     }
                     if (results) {
                         req.session.email =  email;    
-                        console.log(results)
-                        return res.render('loginTest');
+                            db.query('SELECT * FROM car WHERE status = "available" ', (error, results) => {
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    return res.render("store", {
+                                        cars: results
+                                    });
+                                }
+                            });
+                        
                     } else {
                         return res.render('login', {
                             message: 'Invalid Credentials'

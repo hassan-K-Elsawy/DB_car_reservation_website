@@ -31,7 +31,7 @@ CREATE TABLE reservation(
     plateID varchar(20) NOT NULL,
     recieveDate date NOT NULL,
     returnDate date,
-    payment int,
+    payment Real,
 
     PRIMARY KEY (reservationID),
     FOREIGN KEY (userID) REFERENCES `user`(userID),

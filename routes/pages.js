@@ -141,13 +141,15 @@ router.post("/cart", (req, res) => {
         }
     })
 });
-
+/*
 router.post("/reserve", (req, res) => {
     console.log('the customer has payed successfuly')
     const email = req.session.email;
     var { plateID, reserveDate, returnDate, price} = req.body;
     reserveDate = new Date(reserveDate);
     returnDate = new Date(returnDate);
+    reserveDate.toISOString().slice(0, 11).replace('T', ' ');
+    returnDate.toISOString().slice(0, 11).replace('T', ' ');
 
     if (returnDate.getTime() < reserveDate.getTime()) { //check if the reserve date is after the return date
         // database call:
@@ -172,8 +174,10 @@ router.post("/reserve", (req, res) => {
             if (error) {
                 console.log(error);
             } else {
+                //db.query('Update car SET status = "reserved" WHERE plateID = ?')
 
                     oldRes = oldResResult;
+                    db.query('SELECT userID FROM user WHERE email LIKE ?',[email],(erroor,userID)=>{
 
                     // database call end.
         if (oldRes != null && oldRes[0] != null) {
@@ -184,9 +188,10 @@ router.post("/reserve", (req, res) => {
                 reservingDays = reservingDays / (1000*60*60*24);
                 price = reservingDays * price;
 
+                
                 //database call:
-                db.query('INSERT INTO reservation (userID,plateID,recieveDate,returnDate) VALUES (?,?,?,?)',
-                        [req.session.userID, plateID, reserveDate.toISOString(), returnDate.toISOString()], 
+                db.query('INSERT INTO reservation (userID,plateID,recieveDate,returnDate,payment) VALUES (?,?,?,?,?)',
+                        [userID, plateID, reserveDate.toISOString(), returnDate.toISOString(),price], 
                         (qerr2, results) => {
                                                 if (qerr2) {
                                                     console.log(qerr2);
@@ -203,6 +208,7 @@ router.post("/reserve", (req, res) => {
                         });
                     }
                 });
+                
             } 
             
             else {
@@ -226,8 +232,8 @@ router.post("/reserve", (req, res) => {
 
         } else {
             //database call:
-            db.query('INSERT INTO reservation (userID,plateID,recieveDate,returnDate) VALUES (?,?,?,?)',
-                [req.session.userID, plateID, reserveDate.toISOString(), returnDate.toISOString()],
+            db.query('INSERT INTO reservation (userID,plateID,recieveDate,returnDate,payment) VALUES (?,?,?,?,?)',
+                [userID, plateID, reserveDate.toISOString(), returnDate.toISOString(), price],
                 (qerr, results) => {
                                         if (qerr) {
                                             console.log(qerr);
@@ -244,28 +250,34 @@ router.post("/reserve", (req, res) => {
                     });
                 }
             });
-        }
-
-
-
             }
+
+        })
+
+        }
         });
 
     }
 
-})
+})*/
 
 router.get("/reservations", (req, res) => {
-    db.query('SELECT * FROM reservation r INNER JOIN car c ON r.plateID = c.plateID', (error, results) => {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log(results);
-            return res.render("reservations", {
-                reservation: results
-            });
-        }
-    });
+    session  = req.session;
+    db.query('SELECT userID FROM user WHERE email LIKE ?',[session.email],(err,result)=>{
+        if(err){
+            console.log(err)
+        }else{
+            db.query('SELECT * FROM reservation r INNER JOIN user u ON r.userID = u.userID',[result[0]], (error, results) => {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log(results);
+                return res.render("reservations", {
+                    reservation: results
+                });
+            }
+        });
+    }});
 });
 
 router.get('/storeAdmin',(req, res)=>{
@@ -293,15 +305,12 @@ router.get("/reservationsAdmin", (req,res) =>{
     });
 });
 
-router.get('/pay', (req,res)=>{
-
-})
-
-router.post("/reserve",(req,res) => {
-    const {recDate , retDate, car} = req.body;
-    db.query('INSERT INTO reservation Set ?', {plateID:plateID , status:status, rentVal:price, year:year, producer:producer, model:model, color:color, millageOnFullTank:millage, fuelType:fuelType, noOfSeats:noOfSeats, type:type},(error, results)=>{
-        if(error){
-            console.log(error);
+router.get('/cancel', (req,res)=>{
+    const resID = req.body.resID;
+    console.log(resID);
+    db.query('DELETE FROM reservation WHERE reservationID = ?', [resID],  (erro,results)=>{
+        if(erro){
+            console.log(erro)
         }else{
             db.query(' SELECT * FROM car ', (error, results)=>{
                 if(error){
@@ -314,8 +323,41 @@ router.post("/reserve",(req,res) => {
             });
         }
     });
-    return res.render('addCar')
+})
 
+router.post("/reserve",(req,res) => {
+    session  = req.session;
+    var {reserveDate , returnDate, plateID, rentVal} = req.body;
+    reserveDate = new Date(reserveDate);
+    returnDate = new Date(returnDate);
+    var reservingDays = returnDate.getTime() - reserveDate.getTime()
+    reservingDays = reservingDays / (1000*60*60*24);
+    var price = reservingDays * rentVal;
+    reserveDate.toISOString().slice(0, 11).replace('T', ' ');
+    returnDate.toISOString().slice(0, 11).replace('T', ' ');
+
+    const email = req.session.email;
+    db.query('SELECT userID from user where email like ?',[session.email],(err,result)=>{
+    db.query('Update car set status = "reserved" where plateID = ?',[plateID],(errors)=>{
+    var userID = result[0].userID;
+
+    db.query('INSERT INTO reservation Set ?', {plateID:plateID , userID : userID, recieveDate:reserveDate, returnDate:returnDate, payment:500},(error, results)=>{
+        if(error){
+            console.log(error);
+        }else{
+            db.query(' SELECT * FROM car Where status = "available" ', (error, results)=>{
+                if(error){
+                    console.log(error);
+                }else{
+                    return res.render("store", {
+                        cars: results 
+                    });
+                }
+            });
+        }
+    });
+    })
+})
 })
 
 module.exports = router;
