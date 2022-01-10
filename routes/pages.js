@@ -143,6 +143,9 @@ router.post("/cart", (req, res) =>{
 });
 
 router.post("/reserve", (req, res) => {
+
+    console.log('the customer has payed successfuly')
+
     const email = req.session.email;
     var { plateID, reserveDate, returnDate } = req.body;
     reserveDate = new Date(reserveDate);
@@ -289,6 +292,10 @@ router.get("/reservationsAdmin", (req,res) =>{
         }
     });
 });
+
+router.get('/pay', (req,res)=>{
+
+})
 
 router.post("/reserve",(req,res) => {
     const {recDate , retDate, car} = req.body;
