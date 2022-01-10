@@ -11,13 +11,26 @@ const db = mysql.createConnection({
     port: process.env.DATABASE_PORT
 });
 
-
 router.get("/", (req, res) => {
-
-    session = req.session;
-    if (session.email)
-        res.render('store');
-
+    session  = req.session;
+    if(session.email)
+    router.get("/store", (req, res) => {
+        db.query('SELECT * FROM car WHERE status = "available" ', (error, results)=>{
+            if(error){
+                console.log(error);
+            }else{
+                db.query(' SELECT * FROM car ', (error, results)=>{
+                    if(error){
+                        console.log(error);
+                    }else{
+                        return res.render("storeAdmin", {
+                            cars: results 
+                        });
+                    }
+                });
+            }
+        });
+    });
     else
         return res.render('index');
 });
@@ -42,12 +55,12 @@ router.post("/addCaradd", (req, res) =>{
     return res.render('addCar')
 });
 
-router.get("/register", (req, res) => {
+router.get("/register", (req, res) =>{
     res.render('register')
 });
 
-router.get("/Logout", (req, res) => {
-    if (req.session)
+router.get("/Logout", (req, res) =>{
+    if(req.session)
         req.session.destroy();
     res.render('login');
 });
@@ -95,39 +108,37 @@ router.post("/deleteCar", (req,res)=>{
     });
 });
 
-router.get("/Login", (req, res) => {
+router.get("/Login", (req, res) =>{
     res.render('login')
 });
 
-router.get("/specs", (req, res) => {
+router.get("/specs", (req,res)=>{
     res.render('spec');
 });
 
 router.get("/store", (req, res) => {
-    db.query('SELECT * FROM car WHERE status = "available" ', (error, results) => {
-        if (error) {
+    db.query('SELECT * FROM car WHERE status = "available" ', (error, results)=>{
+        if(error){
             console.log(error);
-
-        } else {
+        }else{
             return res.render("store", {
-                cars: results
-
+                cars: results 
             });
         }
     });
 });
 
-router.post("/cart", (req, res) => {
+router.post("/cart", (req, res) =>{
     const carid = req.body.car;
-    db.query('SELECT * FROM car WHERE plateID = ?', [carid], (error, results) => {
-        if (error) {
-            console.log(error);
-        } else {
+    db.query('SELECT * FROM car WHERE plateID = ?',[carid] ,(error, results) =>{
+        if(error){
+                console.log(error);
+        }else{
             //console.log(results);
             return res.render("cart", {
                 car: results[0]
-            });
-        }
+            });  
+        }   
     })
 });
 
@@ -242,16 +253,13 @@ router.post("/reserve", (req, res) => {
 })
 
 router.get("/reservations", (req, res) => {
-
-    db.query('SELECT * FROM reservation r INNER JOIN car c ON r.plateID = c.plateID', (error, results) => {
-        if (error) {
-
-
+    db.query('SELECT * FROM reservation r INNER JOIN car c ON r.plateID = c.plateID', (error, results)=>{
+        if(error){
             console.log(error);
-        } else {
+        }else{
             console.log(results);
             return res.render("reservations", {
-                reservation: results
+                reservation: results 
             });
         }
     });
@@ -282,6 +290,25 @@ router.get("/reservationsAdmin", (req,res) =>{
     });
 });
 
+router.post("/reserve",(req,res) => {
+    const {recDate , retDate, car} = req.body;
+    db.query('INSERT INTO reservation Set ?', {plateID:plateID , status:status, rentVal:price, year:year, producer:producer, model:model, color:color, millageOnFullTank:millage, fuelType:fuelType, noOfSeats:noOfSeats, type:type},(error, results)=>{
+        if(error){
+            console.log(error);
+        }else{
+            db.query(' SELECT * FROM car ', (error, results)=>{
+                if(error){
+                    console.log(error);
+                }else{
+                    return res.render("storeAdmin", {
+                        cars: results 
+                    });
+                }
+            });
+        }
+    });
+    return res.render('addCar')
 
+})
 
 module.exports = router;
