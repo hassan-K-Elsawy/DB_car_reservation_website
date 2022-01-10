@@ -16,8 +16,8 @@
     <nav>
         <h4>DB Project</h4>
         <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/login">Sign out</a></li>
+            <li><a href="/Logout">Sign out</a></li>
+            <li><a href="/storeAdmin">Cars</a></li>
         </ul>
     </nav>
 
@@ -30,13 +30,13 @@
                     <div class="columns">
                         <ul class="price">
                             <li>{{plateID}} {{producer}} {{model}}</li>
-                            <li>recieved {{recieveDate}}</li>
-                            <li>returned {{returnDate}}</li>
+                            <li>to be recieved {{recieveDate}}</li>
+                            <li>to be returned {{returnDate}}</li>
                             <li>{{price}}</li>
                             <li class="grey">
                                 <form action="/cancel" method="POST">
                                     <input type="hidden" id='resID' name='resID' value="{{reservationID}}">
-                                    <input type="submit" value="Pay">
+                                    <input type="submit" value="ret">
                                 </form>
                             </li>
                         </ul>

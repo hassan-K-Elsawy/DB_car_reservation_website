@@ -108,12 +108,16 @@ router.post("/deleteCar", (req,res)=>{
         }
     });
 });
+
 router.get("/Login", (req, res) => {
     res.render('login')
 });
 
 router.get("/specs", (req, res) => {
     res.render('spec');
+});
+router.get("/specsAdmin", (req, res) => {
+    res.render('spec2');
 });
 
 router.get("/store", (req, res) => {
@@ -379,6 +383,31 @@ router.post("/storeSpec",(req,res)=>{
             console.log(error);
         } else {
             return res.render("store", {
+                cars: results
+            });
+        }
+    });
+})
+
+router.post("/storeSpec2",(req,res)=>{
+    var {minPrice, maxPrice,minMile,maxMile} = req.body;
+    if(!minPrice){
+        minPrice = 0;
+    }
+    if(!maxPrice){
+        maxPrice = 5000;
+    }
+    if(!minMile){
+        minMile = 0;
+    }
+    if(!maxMile){
+        maxMile = 5000;
+    }
+    db.query('SELECT * FROM car WHERE rentVal >= ? AND rentVal <= ? AND millageOnFullTank >= ? AND millageOnFullTank <= ? ',[minPrice,maxPrice,minMile,maxMile], (error, results) => {
+        if (error) {
+            console.log(error);
+        } else {
+            return res.render("storeAdmin", {
                 cars: results
             });
         }
