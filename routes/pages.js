@@ -360,4 +360,29 @@ router.post("/reserve",(req,res) => {
 })
 })
 
+router.post("/storeSpec",(req,res)=>{
+    var {minPrice, maxPrice,minMile,maxMile} = req.body;
+    if(!minPrice){
+        minPrice = 0;
+    }
+    if(!maxPrice){
+        maxPrice = 5000;
+    }
+    if(!minMile){
+        minMile = 0;
+    }
+    if(!maxMile){
+        maxMile = 5000;
+    }
+    db.query('SELECT * FROM car WHERE status = "available" AND rentVal >= ? AND rentVal <= ? AND millageOnFullTank >= ? AND millageOnFullTank <= ? ',[minPrice,maxPrice,minMile,maxMile], (error, results) => {
+        if (error) {
+            console.log(error);
+        } else {
+            return res.render("store", {
+                cars: results
+            });
+        }
+    });
+})
+
 module.exports = router;
