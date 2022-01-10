@@ -150,6 +150,8 @@ router.post("/reserve", (req, res) => {
     var { plateID, reserveDate, returnDate } = req.body;
     reserveDate = new Date(reserveDate);
     returnDate = new Date(returnDate);
+    reserveDate.toISOString().slice(0, 11).replace('T', ' ');
+    returnDate.toISOString().slice(0, 11).replace('T', ' ');
 
     if (returnDate.getTime() < reserveDate.getTime()) { //check if the reserve date is after the return date
         // database call:
